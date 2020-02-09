@@ -5,6 +5,9 @@ AMUSE utility functions with Astropy compatibility
     :target: http://www.astropy.org
     :alt: Powered by Astropy Badge
 
+.. image:: https://coveralls.io/repos/github/nstarman/amuse_utils/badge.svg?branch=master
+    :target: https://coveralls.io/github/nstarman/amuse_utils?branch=master
+
 
 License
 -------
