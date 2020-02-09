@@ -1,3 +1,19 @@
+# git-ignore file
+# split into default python and project-specific sections
+
+###############################################################################
+# Project-Specific
+
+# scratch folder
+scratch/
+
+# _old
+**/_old
+
+
+###############################################################################
+# Default
+
 # Compiled files
 *.py[cod]
 *.a
@@ -39,6 +55,7 @@ docs/_build
 dist
 build
 eggs
+.eggs/
 parts
 bin
 var
