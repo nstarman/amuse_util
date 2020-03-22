@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Docstring and Metadata
 """Broken IMF codes.
 
 Routine Listings
@@ -18,13 +17,16 @@ __all__ = ["new_kroupa_mass_distribution"]
 # IMPORTS
 
 # GENERAL
+
 import numpy as np
 
 # amuse
 from amuse.ic.brokenimf import new_broken_power_law_mass_distribution
 from amuse.units import units
 
+
 # PROJECT-SPECIFIC
+
 from .util import imf_number_of_particles_decorator
 
 
@@ -35,10 +37,10 @@ from .util import imf_number_of_particles_decorator
 
 @imf_number_of_particles_decorator(tolerance=1e-7)
 def new_kroupa_mass_distribution(
-    number_of_particles,
+    number_of_particles: int,
     mass_min: units.MSun = 0.01 | units.MSun,
     mass_max: units.MSun = 100.0 | units.MSun,
-    random=True,
+    random: bool=True,
 ):
     """Kroupa (2001) mass distribution in SI units with custom minimum mass.
 
@@ -92,5 +94,6 @@ def new_kroupa_mass_distribution(
 
 # /def
 
+
 ##############################################################################
-### END
+# END

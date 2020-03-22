@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Docstring and Metadata
 """Initialize system method.
 
 initialize_system returns
@@ -36,18 +35,21 @@ from amuse.units import units as u, nbody_system
 from amuse.datamodel import Particles
 
 # CUSTOM
-# from astroPHD import LogFile
-# from astroPHD.decorators import store_function_input
+
+from astroPHD import LogFile
 
 
 # PROJECT-SPECIFIC
-from ..datamodel import AmuseContainer, System
 
+from ..datamodel import AmuseContainer, System
+from ..units import to_amuse_decorator
 from ..utils import store_function_input
 
 
 ##############################################################################
 # PARAMETERS
+
+_LOGFILE = LogFile(verbose=np.inf, header=False)
 
 # typing
 func_or_cls = (FunctionType, type)
@@ -59,6 +61,9 @@ func_or_cls = (FunctionType, type)
 
 
 @store_function_input(store_inputs=True)
+@to_amuse_decorator(  # ensure inputs are in AMUSE units
+    arguments=["Rvirial", "position", "velocity", "obj_radius"]
+)
 def initialize_particles(
     number_of_particles: int,
     *,  # must use kwargs
@@ -80,8 +85,8 @@ def initialize_particles(
     random: (bool, int, np.random.RandomState) = True,
     _scale_to_standard: (bool, dict) = True,
     # logging
-    # logger: LogFile = _LOGFILE,
-    # verbose: (int, None) = None,
+    logger: LogFile = _LOGFILE,
+    verbose: (int, None) = None,
 ):
     """Create objs in a system.
 
@@ -159,25 +164,25 @@ def initialize_particles(
 
     # -------------------------------------------
 
-    # logger.report(
-    #     "\nInitialize Particles Arguments:\n",
-    #     f"number_of_particles: {number_of_particles}",
-    #     # for IMF
-    #     f"imf_func: {imf_func}",
-    #     f"imf_args: {imf_args}",
-    #     f"imf_kwargs: {imf_kwargs}",
-    #     # for distribution function
-    #     f"distr_func: {distr_func}",
-    #     f"distr_args: {distr_args}",
-    #     f"distr_kwargs: {distr_kwargs}",
-    #     # object properties
-    #     f"Rvirial: {Rvirial}",
-    #     f"position: {position}",
-    #     f"velocity: {velocity}",
-    #     f"obj_radius: {obj_radius}",
-    #     sep="\n    ",
-    #     verbose=verbose,
-    # )
+    logger.report(
+        "\nInitialize Particles Arguments:\n",
+        f"number_of_particles: {number_of_particles}",
+        # for IMF
+        f"imf_func: {imf_func}",
+        f"imf_args: {imf_args}",
+        f"imf_kwargs: {imf_kwargs}",
+        # for distribution function
+        f"distr_func: {distr_func}",
+        f"distr_args: {distr_args}",
+        f"distr_kwargs: {distr_kwargs}",
+        # object properties
+        f"Rvirial: {Rvirial}",
+        f"position: {position}",
+        f"velocity: {velocity}",
+        f"obj_radius: {obj_radius}",
+        sep="\n    ",
+        verbose=verbose,
+    )
 
     # ------------------------------------------------------------------------
     # Objects
@@ -192,11 +197,11 @@ def initialize_particles(
         number_of_particles, *imf_args, random=random, **imf_kwargs
     )
 
-    # logger.report(
-    #     "made masses",
-    #     f"made masses, mean: {np.mean(masses)}, sum: {masses.sum()}",
-    #     verbose=verbose,
-    # )
+    logger.report(
+        "made masses",
+        f"made masses, mean: {np.mean(masses)}, sum: {masses.sum()}",
+        verbose=verbose,
+    )
 
     # ------------------------------------
     # converter
@@ -204,9 +209,9 @@ def initialize_particles(
     if converter is None:
         converter = nbody_system.nbody_to_si(masses.sum(), Rvirial)
 
-        # logger.report(
-        #     f"made converter: {masses.sum(), Rvirial}", verbose=verbose,
-        # )
+        logger.report(
+            f"made converter: {masses.sum(), Rvirial}", verbose=verbose,
+        )
 
     # ------------------------------------
     # Create system with origin at <0,0,0> and no net velocity
@@ -229,11 +234,11 @@ def initialize_particles(
             convert_nbody=converter, **kw,
         )
 
-    # logger.report(
-    #     "made objects",
-    #     f"system has virial radius: {objs.virial_radius().in_(u.parsec)}",
-    #     verbose=verbose,
-    # )
+    logger.report(
+        "made objects",
+        f"system has virial radius: {objs.virial_radius().in_(u.parsec)}",
+        verbose=verbose,
+    )
 
     # add in the properties
     objs.radius = obj_radius  # object sizes (generally 0, pt size)
@@ -243,7 +248,7 @@ def initialize_particles(
     objs.position += position
     objs.velocity += velocity
 
-    # logger.report("added mean position & velocity to system", verbose=verbose)
+    logger.report("added mean position & velocity to system", verbose=verbose)
 
     return objs, converter
 
@@ -255,6 +260,16 @@ def initialize_particles(
 
 
 @store_function_input(store_inputs=True)
+@to_amuse_decorator(  # ensure inputs are in AMUSE units
+    arguments=[
+        "Rvirial",
+        "position",
+        "velocity",
+        "obj_radius",
+        "smoothing_length",
+        "timestep",
+    ]
+)
 def initialize_system(
     number_of_particles: (int, Particles),
     *,  # must use kwargs
@@ -289,12 +304,12 @@ def initialize_system(
     _num_particles_reconstruct: (int, None) = None,
     # channel_attrs=None,
     # logging
-    # logger: LogFile = _LOGFILE,
-    # verbose: (int, None) = None,
+    logger: LogFile = _LOGFILE,
+    verbose: (int, None) = None,
     # debugging
     _scale_to_standard: bool = True,
 ):
-    """Create objs in a system.
+    """Create objects in a system.
 
     modelled from:
     https://github.com/amusecode/amuse/blob/master/examples/textbook/solar_cluster_in_live_galaxy.py
@@ -307,42 +322,46 @@ def initialize_system(
         if Particles instance, then the `imf_`, `distr_,
         and kwargs before `evln_func` are ignored
 
-    imf_func: function
+    imf_func: FunctionType
         function for initial mass function
         ex) new_kroupa_mass_distribution
         signature of function should be
         func(number_of_particles, *imf_args, random=random, **imf_kwargs)
-    imf_args: list, optional (default [])
+    imf_args: list, optional
         the arguments for `imf_func`
-    imf_kwargs: dictionary, optional (default {})
+    imf_kwargs: dict, optional
         the kwargs for `imf_func`
 
-    distr_func: function
+    distr_func: FunctionType
         function for object spatial distribution
         ex) new_plummer_model
         signature of function should be
         func(number_of_particles, *distr_args,
              convert_nbody=converter, **distr_kwargs)
-    distr_args: list, optional (default [])
+    distr_args: list, optional
         the arguments for `distr_func`
-    distr_kwargs: dictionary, optional (default {})
+    distr_kwargs: dict, optional
         the kwargs for `distr_func`
 
-    Rvirial: distance quantity, optional (default 10 pc)
-        the virial radius of the system
-    position: distance 3-list quantity, optional (default [0,0,0] pc)
+    Rvirial: Quantity, optional
+        the virial radius of the system, default 10 pc
+    position: Quantity, optional
         the position of the system in GC coordinates
-    velocity: velocity 3-list quantity, optional (default [0,0,0] kms)
+        default [0,0,0] pc
+    velocity: Quantity, optional
         the velocity of the system in GC coordinates
-    obj_radius: distance quantity, optional (default 0 AU)
-        the radius of the individual objects
+        (default [0,0,0] kms)
+    obj_radius: Quantity, optional
+        the radius of the individual objects,
+        (default 0 AU)
 
-    evln_func: function or False, optional  (default False)
+    evln_func: FunctionType or False, optional
+        (default False)
         object evolution function
-    imf_kwargs: dictionary, optional
+    imf_kwargs: dict, optional
         the kwargs for `evln_func`
 
-    gravity_func: function or False, optional  (default False)
+    gravity_func: FunctionType or False, optional
         gravity code
         signature of function should be
         func(converter, *`gravity_args`,
@@ -350,24 +369,30 @@ def initialize_system(
              **`gravity_kwargs`)
     gravity_args: list, optional
         the arguments for `gravity_func`
-    gravity_kwargs: dictionary, optional
+    gravity_kwargs: dict, optional
         the kwargs for `gravity_func`
-    smoothing_length: distance quantity, optional (default 0 pc)
+    smoothing_length: Quantity, optional
         the smoothing length used in scaling and the gravity
-    opening_angle: float, optional  (default 0.6)
-    number_of_workers: int, optional  (default 1)
+        (default 0 pc)
+    opening_angle: float, optional
+        (default 0.6)
+    number_of_workers: int, optional
         number of gravity workers
+        (default 1)
     use_self_gravity: int
-        flag for usage of self gravity, 1 or 0 (true or false)
+        flag for usage of self gravity, 1 or 0 (True or False)
     converter: nbody_to_si, optional
         nbody converter, takes total mass and virial radius
         calculated if not provided
-    timestep: time quantity, optional  (default 1 Myr)
+    timestep: time quantity, optional
         the timestep for evolving the gravity and stellar evolution
-    random: True or random number generator, optional (default True)
+        (default 1 Myr)
+    random: True or Generator, optional
+        (default True)
         ex: np.random.default_rng(seed=0)
         will default to random seed
-    # channel_attrs: list or None, optional (default None)
+    _scale_to_standard: bool
+        whether to call ``scale_to_standard``
 
     Returns
     -------
@@ -402,44 +427,46 @@ def initialize_system(
 
     # -------------------------------------------
 
-    # logger.newsection("Initialize System")
-    # logger.report(
-    #     "\nInitialize System Arguments:\n",
-    #     f"number_of_particles: {number_of_particles}",
-    #     # for IMF
-    #     f"imf_func: {imf_func}",
-    #     f"imf_args: {imf_args}",
-    #     f"imf_kwargs: {imf_kwargs}",
-    #     # for distribution function
-    #     f"distr_func: {distr_func}",
-    #     f"distr_args: {distr_args}",
-    #     f"distr_kwargs: {distr_kwargs}",
-    #     # object properties
-    #     f"Rvirial: {Rvirial}",
-    #     f"position: {position}",
-    #     f"velocity: {velocity}",
-    #     f"obj_radius: {obj_radius}",
-    #     # for evolution
-    #     f"evln_func: {evln_func}",
-    #     f"evln_kwargs: {evln_kwargs}",
-    #     # for gravity
-    #     f"gravity_func: {gravity_func}",
-    #     f"gravity_args: {gravity_args}",
-    #     f"gravity_kwargs: {gravity_kwargs}",
-    #     f"smoothing_length: {smoothing_length}",
-    #     f"opening_angle: {opening_angle}",
-    #     f"number_of_workers: {number_of_workers}",
-    #     f"use_self_gravity: {use_self_gravity}",
-    #     # util
-    #     f"converter: {converter}",
-    #     f"timestep: {timestep}",
-    #     f"random: {random}",
-    #     f"channel_attrs: {'deprecated'}",
-    #     # debugging
-    #     f"_scale_to_standard: {_scale_to_standard}",
-    #     sep="\n    ",
-    #     verbose=verbose,
-    # )
+    logger.newsection(
+        "Initialize System", print=verbose > 0 if verbose is not None else True
+    )
+    logger.report(
+        "\nInitialize System Arguments:\n",
+        f"number_of_particles: {number_of_particles}",
+        # for IMF
+        f"imf_func: {imf_func}",
+        f"imf_args: {imf_args}",
+        f"imf_kwargs: {imf_kwargs}",
+        # for distribution function
+        f"distr_func: {distr_func}",
+        f"distr_args: {distr_args}",
+        f"distr_kwargs: {distr_kwargs}",
+        # object properties
+        f"Rvirial: {Rvirial}",
+        f"position: {position}",
+        f"velocity: {velocity}",
+        f"obj_radius: {obj_radius}",
+        # for evolution
+        f"evln_func: {evln_func}",
+        f"evln_kwargs: {evln_kwargs}",
+        # for gravity
+        f"gravity_func: {gravity_func}",
+        f"gravity_args: {gravity_args}",
+        f"gravity_kwargs: {gravity_kwargs}",
+        f"smoothing_length: {smoothing_length}",
+        f"opening_angle: {opening_angle}",
+        f"number_of_workers: {number_of_workers}",
+        f"use_self_gravity: {use_self_gravity}",
+        # util
+        f"converter: {converter}",
+        f"timestep: {timestep}",
+        f"random: {random}",
+        f"channel_attrs: {'deprecated'}",
+        # debugging
+        f"_scale_to_standard: {_scale_to_standard}",
+        sep="\n    ",
+        verbose=verbose,
+    )
 
     # ------------------------------------------------------------------------
     # Objects
@@ -477,8 +504,8 @@ def initialize_system(
             random=random,
             _scale_to_standard=_scale_to_standard,
             # logging
-            # logger=logger,
-            # verbose=verbose,
+            logger=logger,
+            verbose=verbose,
             # decorator
             store_inputs=False,
         )
@@ -505,11 +532,11 @@ def initialize_system(
         # add particles to evolution code
         evln.particles.add_particles(objs)
 
-        # logger.report(
-        #     "added stellar evolution",
-        #     f"added stellar evolution from function {evln_func}",
-        #     verbose=verbose,
-        # )
+        logger.report(
+            "added stellar evolution",
+            f"added stellar evolution from function {evln_func}",
+            verbose=verbose,
+        )
 
         # particles should be the master list
         # the evolution, if it exists needs to update the particles properties
@@ -519,7 +546,7 @@ def initialize_system(
     else:
         evln = None
 
-        # logger.report("no evolution", verbose=verbose)
+        logger.report("no evolution", verbose=verbose)
 
     # ------------------------------------------------------------------------
     # gravity
@@ -536,17 +563,16 @@ def initialize_system(
         )
 
         _gravity = gravity_func(*ba.args, **ba.kwargs)
-
-        if _num_particles_reconstruct is not None:
-            ba.arguments["number_of_particles"] = _num_particles_reconstruct
-        gravity = AmuseContainer(_gravity, "gravity", _inputs=ba)
-
         # gravity = gravity_func(
         #     converter,
         #     *gravity_args,
         #     number_of_workers=number_of_workers,
         #     **gravity_kwargs,
         # )
+
+        if _num_particles_reconstruct is not None:
+            ba.arguments["number_of_particles"] = _num_particles_reconstruct
+        gravity = AmuseContainer(_gravity, "gravity", _inputs=ba)
 
         # add in gravity parameters
         gravity.parameters.use_self_gravity = use_self_gravity
@@ -560,13 +586,13 @@ def initialize_system(
         # BHtree, not sure if affects others
         gravity.commit_particles()  # needed for BHTree. doesn't affect others?
 
-        # logger.report(f"added gravity code {gravity_func}", verbose=verbose)
+        logger.report(f"added gravity code {gravity_func}", verbose=verbose)
 
     else:
 
         gravity = None
 
-        # logger.report("no no gravity", verbose=verbose)
+        logger.report("no no gravity", verbose=verbose)
 
     # -------------------------------------------------------------------------
     # make a system & store inputs for reproduction

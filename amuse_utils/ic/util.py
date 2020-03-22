@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Docstring and Metadata
 """Utility Functions for Initial Conditions.
 
 Routine Listings
@@ -16,14 +15,27 @@ __author__ = "Nathaniel Starkman"
 # IMPORTS
 
 # GENERAL
-import functools
-import numpy as np
+
 from types import FunctionType
+from typing import Optional, Union, Tuple, Any
+
+import numpy as np
 
 from amuse.units import units as u
 
+try:
+    import astroPHD
+except ImportError:
+    import functools
+    _GOOD_DECORATORS = False
+else:
+    from astroPHD.util.functools import functools
+    _GOOD_DECORATORS = True
+
+
 ##############################################################################
 # CODE
+##############################################################################
 
 
 def num_particles_from_mtot_given_mass_func(
@@ -33,10 +45,8 @@ def num_particles_from_mtot_given_mass_func(
     imf_kwargs: dict = {},
     tolerance: float = 0.01,
     random=0,
-):
-    """num_particles_from_mtot_given_mass_func.
-
-    Finds the number of particles in a cluster of mass `target_mass`.
+) -> Tuple[int, Any, Any]:  # TODO correct Any
+    """Finds the number of particles in a cluster of mass `target_mass`.
 
     Parameters
     ----------
@@ -90,7 +100,7 @@ def num_particles_from_mtot_given_mass_func(
 
     # iterating to find correct N
     # stop when reach desired tolerance
-    i = 0  # prevent infinite loop
+    i: int = 0  # prevent infinite loop
     while (_frac_err(M) > tolerance) & (i < 50):
         i += 1
 
@@ -144,9 +154,12 @@ def num_particles_from_mtot_given_mass_func(
 # /def
 
 
+# ------------------------------------------------------------------------
+
+
 def imf_number_of_particles_decorator(
-    function=None, *, tolerance: float = 1e-5
-):
+    function: Optional[FunctionType]=None, *, tolerance: float = 1e-5
+) -> FunctionType:
     """For IMF functions, allows mass argument for `number_of_particles`.
 
     `number_of_particles` must be a float. If a mass-unit argument is given,
@@ -180,11 +193,11 @@ def imf_number_of_particles_decorator(
     # @functools.wraps(function, _doc_style="numpy")
     @functools.wraps(function)
     def wrapper(
-        number_of_particles,
-        *func_args,
+        number_of_particles: Union[int, Any],  # TODO correct Any
+        *func_args: Any,
         m_to_n_tol: float = tolerance,
-        **func_kwargs,
-    ):
+        **func_kwargs: Any,
+    ) -> Any:
         """Wrapper docstring.
 
         Parameters

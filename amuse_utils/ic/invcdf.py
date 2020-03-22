@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 
-# Docstring and Metadata
-"""Model generator from CDF distribution."""
+"""Model generator from CDF distribution.
+
+Routine Listings
+----------------
+MakeSphericalMassEnclModel
+new_sphericalmassencl_model
+new_sphericalmassencl_sphere
+
+"""
 
 __author__ = "Nathaniel Starkman"
 
@@ -14,16 +21,19 @@ __all__ = [
 ##############################################################################
 # IMPORTS
 
-# General
-import numpy as np
-import numpy.random
+# GENERAL
 
 from types import FunctionType
+
+import numpy as np
+import numpy.random
 
 from amuse import datamodel
 from amuse.units import units as u, nbody_system
 
-# Project-Specific
+
+# PROJECT-SPECIFIC
+
 from ..util import amuseify_array
 
 
@@ -35,10 +45,13 @@ from ..util import amuseify_array
 class MakeSphericalMassEnclModel(object):
     """Make Mass Model from Enclosed Mass Function.
 
+    References
+    ----------
     https://github.com/peterewills/itsample/blob/master/itsample.py
     https://codereview.stackexchange.com/questions/196286/inverse-transform-sampling
     https://usmanwardag.github.io/python/astronomy/2016/07/10/inverse-transform-sampling-with-python.html
     https://en.wikipedia.org/wiki/Inverse_transform_sampling
+
     """
 
     def __init__(
