@@ -1,26 +1,38 @@
 # -*- coding: utf-8 -*-
 
-# Docstring and Metadata
-"""System(s)."""
+"""System(s).
+
+Routine Listings
+----------------
+System
+Systems
+
+"""
 
 __author__ = "Nathaniel Starkman"
+
+__all__ = [
+    "System",
+    "Systems",
+]
+
 
 ###############################################################################
 # IMPORTS
 
 # GENERAL
+
 import itertools
 from dataclasses import dataclass as _dataclass
+from typing import Any, Optional, Union
 
 # amuse
-from amuse.units.quantities import ScalarQuantity
 from amuse.couple import bridge
 from amuse.datamodel.particles import Particles
-
-# typing
-from typing import Any
+from amuse.units.quantities import ScalarQuantity
 
 # PROJECT-SPECIFIC
+
 from ._container import AmuseContainer
 
 
@@ -48,7 +60,9 @@ def _system_reconstructor(args, kwargs):
 # /def
 
 
-@_dataclass
+# ------------------------------------------------------------------------
+
+
 class System:
     """Class for grouping AMUSE code about a single system.
 
@@ -66,27 +80,15 @@ class System:
 
     """
 
-    particles: Particles = None
-    evolution: Any = None
-    gravity: Any = None
-
-    # util
-    converter: Any = None
-    channel_attrs: Any = None
-
-    def __getitem__(self, key):
-        """Getitem via getattr."""
-        return getattr(self, key)
-
-    # /def
-
-    def __setitem__(self, key, value):
-        """Setitem via setattr."""
-        setattr(self, key, value)
-
-    # /def
-
-    def __post_init__(self):
+    def __init__(
+        self,
+        particles: Optional[Particles] = None,
+        evolution: Optional[Any] = None,
+        gravity: Optional[Any] = None,
+        converter: Optional[Any] = None,
+        channel_attrs: Optional[list] = None,
+        **kw,
+    ):
         """Dataclass post initialization.
 
         ensures the particles, evolution, and gravity codes are wrapped
@@ -95,6 +97,17 @@ class System:
         makes channels between the all the codes
 
         """
+        self.particles = particles
+        self.evolution = evolution
+        self.gravity = gravity
+
+        # util
+        self.converter = converter
+        self.channel_attrs = channel_attrs
+
+        for k, v in kw.items():
+            setattr(self, k, v)
+
         names = ["particles", "evolution", "gravity"]
 
         for n in names:
@@ -106,7 +119,7 @@ class System:
         for n1, n2 in itertools.permutations(names, 2):
             # print("Making channels:")
             if (self[n1] is not None) and (self[n2] is not None):
-                print("\t", n1, "<->", n2)
+                # print("\t", n1, "<->", n2)
                 self[n1].add_channel_to(
                     self[n2], attributes=self.channel_attrs
                 )
@@ -116,6 +129,58 @@ class System:
 
     # /def
 
+    # ---------------------------------------------------------------
+    # Get / Set
+
+    def __getitem__(self, key):
+        """Getitem via getattr.
+
+        supports key.subkey where `key` is in self and `subkey`
+        is an item (dictionary get) of `self.key`
+
+        """
+        k0, *ks = key.split(".")
+        if not ks:  # ks is empty
+            return getattr(self, k0)
+        else:  # pass to AmuseContainer
+            return getattr(self, k0)[".".join(ks)]
+
+    # /def
+
+    def __setitem__(self, key, value):
+        """Setitem via setattr."""
+        setattr(self, key, value)
+
+    # /def
+
+    # ---------------------------------------------------------------
+    # Representations
+
+    def __repr__(self):
+        """Modified representation.
+
+        Returns
+        -------
+        str
+            standard representation
+            with particles, evolution, and gravity fields.
+
+        """
+        _repr = "\n".join(
+            (
+                super().__repr__(),
+                f"\tparticles: {self.particles.__repr__()}",
+                f"\tevolution: {self.evolution.__repr__()}",
+                f"\tgravity: {self.gravity.__repr__()}",
+            )
+        )
+        return _repr
+
+    # /def
+
+    # ---------------------------------------------------------------
+    # Serialize
+
     def __reduce_ex__(self, protocol):
         """Reduce for serialization.
 
@@ -123,17 +188,7 @@ class System:
         """
         redx = (
             _system_reconstructor,
-            (
-                [],
-                {
-                    "particles": self.particles,
-                    "evolution": self.evolution,
-                    "gravity": self.gravity,
-                    "converter": self.converter,
-                    "channel_attrs": self.channel_attrs,
-                    # TODO any user-defined attribute
-                },
-            ),
+            ([], self.__dict__,),
             None,
             None,
             None,
@@ -141,6 +196,9 @@ class System:
         return redx
 
     # /def
+
+    # ---------------------------------------------------------------
+    # Plot
 
     def plot_particles(self, d1="x", d2="y"):
         """In progress."""
@@ -160,6 +218,10 @@ class Systems:
 
     Parameters
     ----------
+    internal_bridges: dict:
+        `bridges` arguments into ``self.bridge_internal_systems``
+    timestep:
+        Bridge timestep
     use_threading: bool (default False)
         whether to use threading
     **systems: {name: System} pairs
@@ -168,28 +230,131 @@ class Systems:
     -------
     systems: Systems instance
 
+    TODO
+    ----
+    make internal_bridges update when add more bridges,
+        currently static on initialization
+
     """
 
-    def __init__(self, *, use_threading=False, **systems):
+    def __init__(
+        self,
+        *,
+        internal_bridges={},
+        timestep=None,
+        use_threading=True,
+        **systems,
+    ):
         """Initialize a Systems instance."""
         super().__init__()
+        # save inputs
+        self._use_threading = use_threading
+        self._init_internal_bridges = internal_bridges
+        self._init_timestep = timestep
+
         self.gravity = bridge.Bridge(use_threading=use_threading)
-        self.system_list = list(systems.keys())
+        self.system_list = set()  # system list set
 
         for k, v in systems.items():
             self[k] = v
 
+        # now do bridges. needed to create systems first
+        self.bridge_internal_systems(
+            bridges=internal_bridges, timestep=timestep
+        )
+
     # /def
 
+    # ---------------------------------------------------------------
+    # Representations
+
+    def __repr__(self):
+        """Modified representation.
+
+        Returns
+        -------
+        str
+            standard representation
+            with gravity and all user-defined fields.
+            TODO full field detail
+
+        """
+        _repr = "\n".join(
+            (
+                super().__repr__(),
+                f"\t{self.gravity}",
+                *[f"\t{k}" for k in self.system_list],
+            )
+        )
+        return _repr
+
+    # /def
+
+    # ---------------------------------------------------------------
+    # Serialize
+
     def __getitem__(self, key):
-        """Getitem via getattr."""
-        return getattr(self, key)
+        """Getitem via getattr.
+
+        supports key.subkey where `key` is in self and `subkey`
+        is an item (dictionary get) of `self.key`
+
+        """
+        k0, *ks = key.split(".")
+        if not ks:  # ks is empty
+            return getattr(self, k0)
+        else:  # pass to System
+            return getattr(self, k0)[".".join(ks)]
 
     # /def
 
     def __setitem__(self, key, value):
         """Setitem via setattr."""
         setattr(self, key, value)
+        self.system_list.add(key)
+
+    # /def
+
+    # ---------------------------------------------------------------
+    # Bridges
+
+    def bridge_internal_systems(
+        self, bridges: dict, timestep: Union[ScalarQuantity, str, None] = None
+    ):
+        """Bridge gravity within Systems.
+
+        Works on gravity only.
+
+        Parameters
+        ----------
+        bridges: dict
+            ex: "cluster.gravity": ["galaxy.gravity", "cdf_code"]
+        timestep: None or amuse ScalarQuantity or str
+            if None, assume already have set a time step
+            if str, self[timestep]
+
+        Returns
+        -------
+        self.gravity:
+            for chaining
+
+        """
+        # add bridges
+        # iterate through dictionary of bridges {'system': []}
+        for name, deps in bridges.items():
+            if not isinstance(deps, (list, tuple)):
+                raise TypeError(f"args for {name} must be a list/tuple")
+            self.gravity.add_system(
+                self[name], partners=[self[dep] for dep in deps]
+            )
+
+        if timestep is not None:
+            if isinstance(timestep, str):
+                timestep = self[timestep]
+            self.gravity.timestep = timestep  # set gravity
+            self._init_timestep = timestep  # also (re)save timestep
+
+        return self.gravity
 
     # /def
 

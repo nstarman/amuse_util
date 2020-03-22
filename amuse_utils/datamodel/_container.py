@@ -1,9 +1,25 @@
 # -*- coding: utf-8 -*-
 
-# Docstring and Metadata
-"""Container for Amuse Particles objects."""
+"""Container for Amuse Particles objects.
+
+Routine Listings
+----------------
+AttrDict
+proxy_reconstructor
+amuse_socket_reconstructor
+AmuseContainer
+
+
+"""
 
 __author__ = "Nathaniel Starkman"
+
+__all__ = [
+    "AmuseContainer",
+    "AttrDict",
+    "proxy_reconstructor",
+    "amuse_socket_reconstructor",
+]
 
 
 ###############################################################################
@@ -211,9 +227,30 @@ class AmuseContainer(wrapt.ObjectProxy):
     # /def
 
     # ---------------------------------------------------------------
-    # serialize
+    # Get / Set
 
-    def __reduce_ex__(self, protocol: Any):
+    def __getitem__(self, key):
+        """Getitem via getattr.
+
+        supports key.subkey where `key` is in self and `subkey`
+        is an attribute of `self.key`
+
+        """
+        try:
+            ks = key.split(".")
+            if len(ks) == 1:  # only one key
+                return getattr(self, ks[0])
+            else:  # pass to AmuseContainer
+                return getattr(getattr(self, ks[0]), ks[1])
+        except AttributeError:  # it's not a string
+            return getattr(self, key)
+
+    # /def
+
+    # ---------------------------------------------------------------
+    # Serialize
+
+    def __reduce_ex__(self, protocol: int):
         """Reduce method for pickling.
 
         Needed b/c Proxies can't normally pickle.
@@ -232,7 +269,7 @@ class AmuseContainer(wrapt.ObjectProxy):
             uses ``proxy_reconstructor``
 
         Notes
-        ------
+        -----
         first tries the internal serialization technique (__reduce_ex__)
         if that fails, which it will for socket objects like BHTree,
         fall back to my socket reconstructor function
@@ -246,6 +283,10 @@ class AmuseContainer(wrapt.ObjectProxy):
         --------
         proxy_reconstructor
         amuse_socket_reconstructor
+
+        TODO
+        ----
+        pickle large items with hdf5 in a folder format
 
         """
         # Serialize the wrapped object
@@ -321,7 +362,7 @@ class AmuseContainer(wrapt.ObjectProxy):
             else:
                 raise ValueError("need to pass name")
 
-        # next check that not making channel to same thing
+        # next check that NOT making channel to same thing
         if self.name == name:
             raise ValueError("cannot make channel to self")
         elif name in self.channel_to.keys():
