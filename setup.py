@@ -1,8 +1,15 @@
-#!/usr/bin/env python
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
+# -*- coding: utf-8 -*-
+# see LICENSE.rst
 
-# NOTE: The configuration for the package, including the name, version, and
-# other information are set in the setup.cfg file.
+"""Setup Script.
+
+The configuration for the package, including the name, version, and
+other information are set in the setup.cfg file.
+
+"""
+
+##############################################################################
+# IMPORTS
 
 import os
 import sys
@@ -11,6 +18,8 @@ from setuptools import setup
 
 from extension_helpers import get_extensions
 
+##############################################################################
+# PARAMETERS
 
 # First provide helpful messages if contributors try and run legacy commands
 # for tests or docs.
@@ -76,6 +85,16 @@ except Exception:
     version = '{version}'
 """.lstrip()
 
+
+##############################################################################
+# CODE
+##############################################################################
+
+
 setup(use_scm_version={'write_to': os.path.join('amuse_utils', 'version.py'),
                        'write_to_template': VERSION_TEMPLATE},
       ext_modules=get_extensions())
+
+
+##############################################################################
+# END
