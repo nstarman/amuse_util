@@ -44,8 +44,14 @@ from amuse.units import nbody_system
 
 # CUSTOM
 
-from astroPHD import LogFile
-from astroPHD.decorators import store_function_input
+try:
+    import astroPHD
+except ImportError:
+    from ..utils import store_function_input
+    from ..utils._logging import LogFile
+else:
+    from astroPHD import LogFile
+    from astroPHD.decorators import store_function_input
 
 # PROJECT-SPECIFIC
 

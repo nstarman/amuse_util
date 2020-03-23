@@ -51,7 +51,6 @@ def to_astropy(quantity):
     Notes
     -----
     requires that amuse units are string represented in astropy
-    this is why astroPHD is used.
 
     """
     if isinstance(quantity, Quantity):

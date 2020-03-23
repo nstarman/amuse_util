@@ -39,7 +39,7 @@ __all__ = []
 
 # Packages may add whatever they like to this file, but
 # should keep this content at the top.
-from ._astropy_init import *   # noqa
+from ._astropy_init import *  # noqa
 
 # GENERAL
 
@@ -51,15 +51,18 @@ from .datamodel import System, Systems
 from .ic import (
     initialize_system,
     recreate_system,
-    new_kroupa_mass_distribution,
 )
 from .units import (
-    amuse_units as u,
+    # amuse_units as u,
     amuse_units as amu,
+    astropy_units as apu,
     to_astropy,
     to_amuse,
 )
-from .util import amuseify_array
+# from .utils import amuseify_array
+
+# Import top-level for __all__
+from . import datamodel
 
 
 ##############################################################################
@@ -69,6 +72,25 @@ from .util import amuseify_array
 # __all__ += ['do_primes']   # noqa
 # or you can keep everything from the subpackage with the following instead
 # __all__ += example_mod.__all__
+
+__all__ += [
+    # GENERAL
+    "constants",
+    "nbody_system",
+    # PROJECT-SPECIFIC
+    # datamodel
+    "datamodel",
+    "System",
+    "Systems",
+    # ic
+    "initialize_system",
+    "recreate_system",
+    # units
+    "amu",
+    "apu",
+    "to_astropy",
+    "to_amuse",
+]
 
 
 ##############################################################################

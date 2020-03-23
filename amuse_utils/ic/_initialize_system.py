@@ -36,7 +36,10 @@ from amuse.datamodel import Particles
 
 # CUSTOM
 
-from astroPHD import LogFile
+try:
+    from astroPHD import LogFile
+except ImportError:
+    from ..utils._logging import LogFile
 
 
 # PROJECT-SPECIFIC
@@ -319,14 +322,14 @@ def initialize_system(
     ----------
     number_of_particles: int or Particles
         if int, number of particles in the system
-        if Particles instance, then the `imf_`, `distr_,
+        if Particles instance, then the `imf_`, `distr_`,
         and kwargs before `evln_func` are ignored
 
     imf_func: FunctionType
         function for initial mass function
         ex) new_kroupa_mass_distribution
         signature of function should be
-        func(number_of_particles, *imf_args, random=random, **imf_kwargs)
+        func(`number_of_particles`, `*imf_args`, random=`random`, `**imf_kwargs`)
     imf_args: list, optional
         the arguments for `imf_func`
     imf_kwargs: dict, optional
@@ -336,8 +339,7 @@ def initialize_system(
         function for object spatial distribution
         ex) new_plummer_model
         signature of function should be
-        func(number_of_particles, *distr_args,
-             convert_nbody=converter, **distr_kwargs)
+        func(`number_of_particles`, `*distr_args`, convert_nbody=`converter`, `**distr_kwargs`)
     distr_args: list, optional
         the arguments for `distr_func`
     distr_kwargs: dict, optional
@@ -364,9 +366,7 @@ def initialize_system(
     gravity_func: FunctionType or False, optional
         gravity code
         signature of function should be
-        func(converter, *`gravity_args`,
-             number_of_workers=`number_of_workers`,
-             **`gravity_kwargs`)
+        func(`converter`, `*gravity_args`, number_of_workers=`number_of_workers`, `**gravity_kwargs`)
     gravity_args: list, optional
         the arguments for `gravity_func`
     gravity_kwargs: dict, optional
@@ -403,6 +403,7 @@ def initialize_system(
             - gravity
             - converter
             - channel_attrs
+
         will try to automatically make channels to/from all things
         the amuse particles / evolution / gravity classes are proxied
         in a datamodel.Container that adds .name, .channel_to/from

@@ -12,6 +12,8 @@ Systems
 
 __author__ = "Nathaniel Starkman"
 
+__all__ = ["AmuseContainer", "System", "Systems"]
+
 ###############################################################################
 # IMPORTS
 

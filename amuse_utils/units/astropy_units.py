@@ -31,7 +31,7 @@ from ._add_to_astropy_units import *
 ###############################################################################
 # __ALL__
 
-__all__ += units.__all__
+# __all__ += units.__all__
 __all__ += _add_to_astropy_units.__all__
 
 
