@@ -64,6 +64,36 @@ exclude_patterns.append('_templates')
 rst_epilog += """
 """
 
+intersphinx_mapping['scipy'] = ('https://docs.scipy.org/doc/scipy/reference',
+                                None)
+
+# Show / hide TODO blocks
+todo_include_todos = True
+
+
+# @nstarman added from here to next section
+automodsumm_inherited_members = True
+
+extensions += ['nbsphinx', 'IPython.sphinxext.ipython_console_highlighting']
+exclude_patterns += ['_build', '**.ipynb_checkpoints']
+
+extensions += ['sphinx_automodapi.smart_resolver']
+
+# TODO figure out how astropy autodocuments
+extensions += [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+#  # 'sphinx.ext.doctest', 
+#  # 'sphinx.ext.todo',
+#  # 'sphinx.ext.ifconfig', 
+#  # 'sphinx.ext.graphviz',
+#  'sphinx.ext.inheritance_diagram',
+#  # 'sphinx.ext.doctest',
+#  # 'io_directive',
+#  # 'autodoc_parameters',
+#  # 'sphinx_rtd_theme',
+]
+
 # -- Project information ------------------------------------------------------
 
 # This does not *have* to match the package name, but typically does
@@ -169,6 +199,7 @@ if setup_cfg.get('edit_on_github').lower() == 'true':
     edit_on_github_doc_root = "docs"
 
 # -- Resolving issue number to links in changelog -----------------------------
+
 github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
 
 # -- Turn on nitpicky mode for sphinx (to warn about references not found) ----
