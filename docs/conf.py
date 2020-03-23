@@ -167,7 +167,7 @@ htmlhelp_basename = project + 'doc'
 
 # Static files to copy after template files
 html_static_path = ['_static']
-html_style = 'amuse_utils.css'
+html_style = 'amuse_util.css'
 
 
 # -- Options for LaTeX output -------------------------------------------------

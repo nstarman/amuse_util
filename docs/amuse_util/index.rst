@@ -18,5 +18,5 @@ Subpackages
 Reference/API
 =============
 
-.. automodapi:: amuse_utils
+.. automodapi:: amuse_util
 	:include-all-objects:

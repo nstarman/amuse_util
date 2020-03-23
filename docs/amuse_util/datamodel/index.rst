@@ -7,5 +7,5 @@ This is the documentation for datamodel.
 Reference/API
 =============
 
-.. automodapi:: amuse_utils.datamodel
+.. automodapi:: amuse_util.datamodel
 	:include-all-objects:
