@@ -16,7 +16,7 @@ from astropy.units.core import def_unit
 from astropy import units, constants
 from astropy.units.utils import generate_unit_summary as _gen_summary
 
-from Typing import Dict
+from typing import Dict
 
 ##############################################################################
 # PARAMETERS

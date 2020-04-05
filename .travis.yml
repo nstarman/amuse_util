@@ -48,6 +48,13 @@ env:
         # to open a GUI window.
         - SETUP_XVFB=True
 
+        # AMUSE Settings
+        - OMPI_MCA_rmaps_base_oversubscribe=true
+        - MINICONDA_VERSION="latest"
+        - MINICONDA_PYTHON_MAJOR=3
+        - MINICONDA_LINUX="Linux-x86_64"
+        - MINICONDA_OSX="MacOSX-x86_64"
+
 matrix:
 
     # Don't wait for allowed failures
