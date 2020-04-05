@@ -14,7 +14,7 @@ __author__ = "Nathaniel Starkman"
 
 __all__ = [
     "num_particles_from_mtot_given_mass_func",
-    "imf_number_of_particles_decorator"
+    "imf_number_of_particles_decorator",
 ]
 
 

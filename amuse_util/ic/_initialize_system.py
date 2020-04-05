@@ -36,6 +36,7 @@ from typing import Callable
 
 # amuse
 from amuse.units import units as u, nbody_system
+
 # from amuse.units.core import Quantity
 from amuse.datamodel import Particles
 from amuse.units import generic_unit_converter

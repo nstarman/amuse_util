@@ -20,7 +20,7 @@ __all__ = [
     "separate_bound_unbound",
     "_initialize_star_cluster_bound",
     "_initialize_star_cluster_unbound",
-    "SC_Tuple"
+    "SC_Tuple",
 ]
 
 
