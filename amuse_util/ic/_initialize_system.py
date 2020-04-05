@@ -6,11 +6,13 @@ initialize_system returns
 
 system: datamodel.System object
     a dataclass object with parameters
+
         - particles
         - evolution
         - gravity
         - converter
         - channel_attrs
+
     will try to automatically make channels to/from all things
     the amuse particles / evolution / gravity classes are proxied
     in a datamodel.Container that adds .name, .channel_to/from
@@ -25,14 +27,19 @@ __all__ = ["initialize_system", "recreate_system"]
 # IMPORTS
 
 # GENERAAL
+
 import copy
 import inspect
 import numpy as np
-from types import FunctionType
+
+from typing import Callable
 
 # amuse
 from amuse.units import units as u, nbody_system
+# from amuse.units.core import Quantity
 from amuse.datamodel import Particles
+from amuse.units import generic_unit_converter
+
 
 # CUSTOM
 
@@ -55,7 +62,7 @@ from ..utils import store_function_input
 _LOGFILE = LogFile(verbose=np.inf, header=False)
 
 # typing
-func_or_cls = (FunctionType, type)
+func_or_cls = (Callable, type)
 
 
 ##############################################################################
@@ -71,11 +78,11 @@ def initialize_particles(
     number_of_particles: int,
     *,  # must use kwargs
     # for IMF
-    imf_func: (bool, FunctionType) = True,
+    imf_func: (bool, Callable) = True,
     imf_args: list = [],
     imf_kwargs: dict = {},
     # for distribution function
-    distr_func: (bool, FunctionType) = True,
+    distr_func: (bool, Callable) = True,
     distr_args: list = [],
     distr_kwargs: dict = {},
     # object properties
@@ -160,9 +167,9 @@ def initialize_particles(
     # -------------------------------------------
     # checking types
 
-    if not isinstance(imf_func, FunctionType):
+    if not isinstance(imf_func, Callable):
         raise ValueError("Need to provide an IMF function")
-    if not isinstance(distr_func, FunctionType):
+    if not isinstance(distr_func, Callable):
         raise ValueError("Need to provide a distribution function")
 
     # -------------------------------------------
@@ -281,11 +288,11 @@ def initialize_system(
     number_of_particles: (int, Particles),
     *,  # must use kwargs
     # for IMF
-    imf_func: (bool, FunctionType) = True,
+    imf_func: (bool, Callable) = True,
     imf_args: list = [],
     imf_kwargs: dict = {},
     # for distribution function
-    distr_func: (bool, FunctionType) = True,
+    distr_func: (bool, Callable) = True,
     distr_args: list = [],
     distr_kwargs: dict = {},
     # object properties
@@ -294,10 +301,10 @@ def initialize_system(
     velocity: u.kms = [0, 0, 0] | u.kms,
     obj_radius: u.AU = 0 | u.AU,  # size of each object
     # for evolution
-    evln_func: (bool, FunctionType) = False,
+    evln_func: (bool, Callable) = False,
     evln_kwargs: dict = {},
     # for gravity
-    gravity_func: (bool, FunctionType) = False,
+    gravity_func: (bool, Callable) = False,
     gravity_args: list = [],
     gravity_kwargs: dict = {},
     smoothing_length: u.parsec = 0.0 | u.parsec,
@@ -316,61 +323,72 @@ def initialize_system(
     # debugging
     _scale_to_standard: bool = True,
 ):
-    """Create objects in a system.
+    """Create objects in a `System`.
 
     modelled from:
-    https://github.com/amusecode/amuse/blob/master/examples/textbook/solar_cluster_in_live_galaxy.py
-    https://github.com/webbjj/galpy_profile/blob/master/test_cluster.py
+
+    - ``solar_cluster_in_live_galaxy`` in https://github.com/amusecode/amuse/
+    - https://github.com/webbjj/galpy_profile/blob/master/test_cluster.py
 
     Parameters
     ----------
-    number_of_particles: int or Particles
+    number_of_particles: int or `Particles`
         if int, number of particles in the system
-        if Particles instance, then the `imf_`, `distr_`,
+        if `Particles` instance, then the `imf_`, `distr_`,
         and kwargs before `evln_func` are ignored
 
-    imf_func: FunctionType
+    imf_func: Callable
         function for initial mass function
-        ex) new_kroupa_mass_distribution
-        signature of function should be
-        func(`number_of_particles`, `*imf_args`, random=`random`, `**imf_kwargs`)
+        ex) ``new_kroupa_mass_distribution``
+        signature of function should be::
+
+            func(number_of_particles, *imf_args,
+                 random=random, **imf_kwargs)
+
     imf_args: list, optional
         the arguments for `imf_func`
     imf_kwargs: dict, optional
         the kwargs for `imf_func`
 
-    distr_func: FunctionType
+    distr_func: Callable
         function for object spatial distribution
-        ex) new_plummer_model
-        signature of function should be
-        func(`number_of_particles`, `*distr_args`, convert_nbody=`converter`, `**distr_kwargs`)
+        ex) ``new_plummer_model``
+        signature of function should be::
+
+            func(number_of_particles, *distr_args,
+                 convert_nbody=converter, **distr_kwargs)
+
     distr_args: list, optional
         the arguments for `distr_func`
     distr_kwargs: dict, optional
         the kwargs for `distr_func`
 
-    Rvirial: Quantity, optional
+    Rvirial: `Quantity`, optional
         the virial radius of the system, default 10 pc
-    position: Quantity, optional
+    position: `Quantity`, optional
         the position of the system in GC coordinates
         default [0,0,0] pc
-    velocity: Quantity, optional
+    velocity: `Quantity`, optional
         the velocity of the system in GC coordinates
         (default [0,0,0] kms)
-    obj_radius: Quantity, optional
+    obj_radius: `Quantity`, optional
         the radius of the individual objects,
         (default 0 AU)
 
-    evln_func: FunctionType or False, optional
+    evln_func: Callable or False, optional
         (default False)
         object evolution function
     imf_kwargs: dict, optional
         the kwargs for `evln_func`
 
-    gravity_func: FunctionType or False, optional
+    gravity_func: Callable or False, optional
         gravity code
-        signature of function should be
-        func(`converter`, `*gravity_args`, number_of_workers=`number_of_workers`, `**gravity_kwargs`)
+        signature of function should be::
+
+            func(converter, *gravity_args,
+                 number_of_workers=number_of_workers,
+                 **gravity_kwargs)
+
     gravity_args: list, optional
         the arguments for `gravity_func`
     gravity_kwargs: dict, optional
@@ -400,8 +418,9 @@ def initialize_system(
 
     Returns
     -------
-    system: datamodel.System
+    system: `System`
         a dataclass object with parameters
+
             - particles
             - evolution
             - gravity
@@ -411,6 +430,7 @@ def initialize_system(
         will try to automatically make channels to/from all things
         the amuse particles / evolution / gravity classes are proxied
         in a datamodel.Container that adds .name, .channel_to/from
+
 
     """
     # -------------------------------------------
@@ -627,10 +647,10 @@ def recreate_system(
 
     Parameters
     ----------
-    ba: BoundArguments
-    particles: Particles
+    ba : `inspect.BoundArguments`
+    particles : `Particles`
         should have everything, including for evolution
-    converter:
+    converter : `generic_unit_converter`
         needed if 'converter' not in `ba.kwargs`
         if provided, will overwrite built-in, if exists
 

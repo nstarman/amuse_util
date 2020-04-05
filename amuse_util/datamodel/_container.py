@@ -106,6 +106,8 @@ def proxy_reconstructor(cls, wrapped_reduce: tuple, name: str):
         if len(rest) > 3:
             objstate = rest[3]  # TODO
 
+        objstate  # TODO, USE
+
     # make wrapped object
     wrapped = proxied_obj_reconstructor(*args)
 

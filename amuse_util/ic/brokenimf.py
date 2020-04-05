@@ -10,7 +10,10 @@ new_kroupa_mass_distribution
 
 __author__ = "Nathaniel Starkman"
 
-__all__ = ["new_kroupa_mass_distribution"]
+
+__all__ = [
+    "new_kroupa_mass_distribution",
+]
 
 
 ##############################################################################

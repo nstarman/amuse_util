@@ -1,10 +1,10 @@
-{{ '*' * "%s.data"|format(cookiecutter.module_name)|length() }}
-{{ cookiecutter.module_name }}.data
-{{ '*' * "%s.data"|format(cookiecutter.module_name)|length() }}
+***************
+amuse_util.data
+***************
 
-This is the documentation for {{ cookiecutter.module_name }}.data.
+This is the documentation for `amuse_util.data`.
 
 Reference/API
 =============
 
-.. automodapi:: {{ cookiecutter.module_name }}.data
+.. automodapi:: amuse_util.data

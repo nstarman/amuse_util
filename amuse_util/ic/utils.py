@@ -4,11 +4,18 @@
 
 Routine Listings
 ----------------
-num_particles_from_mtot_given_mass_func
+`num_particles_from_mtot_given_mass_func`
+`imf_number_of_particles_decorator`
 
 """
 
 __author__ = "Nathaniel Starkman"
+
+
+__all__ = [
+    "num_particles_from_mtot_given_mass_func",
+    "imf_number_of_particles_decorator"
+]
 
 
 ##############################################################################
@@ -16,31 +23,20 @@ __author__ = "Nathaniel Starkman"
 
 # GENERAL
 
-from types import FunctionType
-from typing import Optional, Union, Tuple, Any
+from typing import Optional, Union, Callable, Tuple, Any
 
 import numpy as np
 
 from amuse.units import units as u
 
-# extra
-try:
-    import utilipy
-except ImportError:
-    from functools import wraps as _wraps, partial
 
-    _GOOD_DECORATORS = False
+# CUSTOM
 
-    def wraps(*args, **kwargs):
-        """Wraps with utilipy-style signature."""
-        return _wraps(*args)
+from utilipy.utils.functools import wraps, partial
 
-    # /def
 
-else:
-    from utilipy.utils.functools import wraps, partial
-
-    _GOOD_DECORATORS = True
+##############################################################################
+# PARAMETERS
 
 
 ##############################################################################
@@ -50,7 +46,7 @@ else:
 
 def num_particles_from_mtot_given_mass_func(
     target_mass: u.MSun,
-    imf_func: FunctionType,
+    imf_func: Callable,
     imf_args: list = [],
     imf_kwargs: dict = {},
     tolerance: float = 0.01,
@@ -64,7 +60,7 @@ def num_particles_from_mtot_given_mass_func(
         target mass of cluster
     imf_func: function
         the function that generates the IMF
-        signature: imf_func(number_of_particles, *args, **kwargs)
+        signature: ``imf_func(number_of_particles, *args, **kwargs)``
     imf_args: list
         list of arguments for `imf_func`
         should NOT include number_of_particles
@@ -168,18 +164,18 @@ def num_particles_from_mtot_given_mass_func(
 
 
 def imf_number_of_particles_decorator(
-    function: Optional[FunctionType] = None, *, tolerance: float = 1e-5
-) -> FunctionType:
+    function: Optional[Callable] = None, *, tolerance: float = 1e-5
+) -> Callable:
     """For IMF functions, allows mass argument for `number_of_particles`.
 
     `number_of_particles` must be a float. If a mass-unit argument is given,
     it is treated as the total mass and the IMF function is used to
-    infer the float-value for `number_of_particles`
+    infer the float-value for `number_of_particles`.
 
     Parameters
     ----------
-    function : types.FunctionType or None, optional
-        the function to be decoratored
+    function : Callable or None, optional
+        the function to be decorated
         if None, then returns decorator to apply.
     tolerance : float, optional
         mass to number_of_particles conversion tolerance
@@ -188,7 +184,7 @@ def imf_number_of_particles_decorator(
 
     Returns
     -------
-    wrapper : types.FunctionType
+    wrapper : Callable
         wrapper for function
         does a few things
         includes the original function in a method `.__wrapped__`
@@ -198,8 +194,7 @@ def imf_number_of_particles_decorator(
         return partial(imf_number_of_particles_decorator, tolerance=tolerance)
 
     # make decorator, specifying docstring style
-    # @wraps(function, _doc_style="numpy")
-    @wraps(function)
+    @wraps(function, _doc_style="numpy")
     def wrapper(
         number_of_particles: Union[int, Any],  # TODO correct Any
         *func_args: Any,

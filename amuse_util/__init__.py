@@ -3,6 +3,13 @@
 
 """Amuse Utilities with improved Astropy compatibility.
 
+Routine Listings
+----------------
+
+data : module
+
+utils, datamodel, ic, simulation, units
+
 See Also
 --------
 The actual AMUSE docs (https://amuse.readthedocs.io/en/latest/index.html)
@@ -46,6 +53,7 @@ from ._astropy_init import *  # noqa
 
 from amuse.units import constants, nbody_system
 
+
 # PROJECT-SPECIFIC
 
 from .datamodel import System, Systems
@@ -60,8 +68,6 @@ from .units import (
     to_astropy,
     to_amuse,
 )
-
-# from .utils import amuseify_array
 
 # Import top-level modules for __all__
 from . import data, utils, datamodel, ic, simulation, units

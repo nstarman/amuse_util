@@ -8,16 +8,19 @@ Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 __author__ = "Nathaniel Starkman"
 
-# __all__ = [
-#     ""
-# ]
+
+__all__ = [
+    "amuseify_array",
+    "draw_unit_normal",
+    # "store_function_input",
+]
+
 
 ##############################################################################
 # IMPORTS
 
 # GENERAL
-import inspect
-import functools
+
 import numpy as np
 
 # amuse
@@ -28,13 +31,14 @@ from typing import Optional, Sequence
 
 
 # CUSTOM
-try:
-    import utilipy
-except ImportError:
-    _GOOD_DECORATORS = False
-else:
-    _GOOD_DECORATORS = True
-    from utilipy.decorators import store_function_input
+
+from utilipy.decorators import store_function_input
+
+
+##############################################################################
+# TYPES
+
+_GOOD_DECORATORS: bool
 
 
 ##############################################################################
@@ -129,91 +133,6 @@ def draw_unit_normal(
 
 
 # /def
-
-# ------------------------------------------------------------------------
-
-if _GOOD_DECORATORS is False:
-
-    def store_function_input(
-        function=None,
-        *,
-        store_inputs: bool = True,
-        # _doc_style="numpy", _doc_fmt={}
-    ):
-        """Docstring for decorator.
-
-        Description of this decorator
-
-        Parameters
-        ----------
-        function : types.FunctionType or None, optional
-            the function to be decoratored
-            if None, then returns decorator to apply.
-        _get_inputs : bool, optional
-            whether to return all the inputs to the function as a dictionary
-
-        Returns
-        -------
-        wrapper : types.FunctionType
-            wrapper for function
-            does a few things
-            includes the original function in a method `.__wrapped__`
-
-        Other Parameters
-        ----------------
-        _doc_style: str or formatter, optional
-            default 'numpy'
-            parameter to `utilipy.wraps`
-        _doc_fmt: dict, optional
-            default None
-            parameter to `utilipy.wraps`
-
-        """
-        if function is None:  # allowing for optional arguments
-            return functools.partial(
-                store_function_input,
-                store_inputs=store_inputs,
-                # _doc_style=_doc_style,
-                # _doc_fmt=_doc_fmt,
-            )
-
-        sig = inspect.signature(function)
-        # _doc_fmt['wrapped_function'] = function.__name__
-
-        @functools.wraps(
-            function,
-            # _doc_style=_doc_style, _doc_fmt=_doc_fmt
-        )
-        def wrapper(*args, store_inputs: bool = store_inputs, **kw):
-            """Wrapper docstring.
-
-            Parameters
-            ----------
-            store_inputs: bool
-                whether to store function inputs in a BoundArguments instance
-                default {store_inputs}
-
-            Returns
-            -------
-            inputs: BoundArguments
-                the inputs to ``{wrapped_function}``
-                only returned if `store_inputs` is True
-                other returned values are in now in a tuple
-
-            """
-            return_ = function(*args, **kw)
-            if store_inputs:
-                inputs = sig.bind_partial(*args, **kw)
-                inputs.apply_defaults()
-                return return_, inputs
-            else:
-                return return_
-
-        # /def
-
-        return wrapper
-
-    # /def
 
 
 ##############################################################################

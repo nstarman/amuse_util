@@ -1,11 +1,10 @@
-***********************
-datamodel Documentation
-***********************
+********************
+amuse_util.datamodel
+********************
 
-This is the documentation for datamodel.
+This is the documentation for `amuse_util.datamodel`.
 
 Reference/API
 =============
 
 .. automodapi:: amuse_util.datamodel
-	:include-all-objects:

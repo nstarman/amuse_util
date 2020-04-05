@@ -4,11 +4,11 @@
 
 Routine Listings
 ----------------
-initialize_star_cluster
-separate_bound_unbound
-
-_initialize_star_cluster_bound
-_initialize_star_cluster_unbound
+`initialize_star_cluster`
+`separate_bound_unbound`
+`_initialize_star_cluster_bound`
+`_initialize_star_cluster_unbound`
+`SC_Tuple`
 
 
 """
@@ -16,11 +16,11 @@ _initialize_star_cluster_unbound
 __author__ = "Nathaniel Starkman"
 
 __all__ = [
-    "SC_Tuple",
     "initialize_star_cluster",
     "separate_bound_unbound",
     "_initialize_star_cluster_bound",
     "_initialize_star_cluster_unbound",
+    "SC_Tuple"
 ]
 
 
@@ -40,8 +40,6 @@ import amuse.units.units as amu
 from amuse.datamodel import Particles
 from amuse.units import nbody_system
 
-# typing
-# from typing import Optional
 
 # CUSTOM
 
@@ -64,7 +62,7 @@ from ..units import to_amuse_decorator
 # PARAMETERS
 
 SC_Tuple = namedtuple(
-    "separate_bound_unbound",
+    "SC_Tuple",
     ["bound_system", "bound_inputs", "unbound_system", "unbound_inputs"],
 )  # star cluster bound / unbound
 
@@ -126,20 +124,23 @@ def initialize_star_cluster(
     # debugging
     _scale_to_standard: bool = True,
 ) -> SC_Tuple:
-    """Docstring.
+    """Initialize Star Cluster.
 
     Parameters
     ----------
     number_of_particles: int or Particles
         if int, number of particles in the system
-        if Particles instance, then the `imf_`, `distr_,
+        if Particles instance, then the `imf_`, `distr_`,
         and kwargs before `evln_func` are ignored
 
     imf_func: Callable
         function for initial mass function
-        ex) new_kroupa_mass_distribution
-        signature of function should be
-        func(number_of_particles, *imf_args, random=random, **imf_kwargs)
+        ex) ``new_kroupa_mass_distribution``
+        signature of function should be::
+
+            func(number_of_particles, *imf_args,
+                 random=random, **imf_kwargs)
+
     imf_args: list, optional
         the arguments for `imf_func`
     imf_kwargs: dict, optional
@@ -147,10 +148,12 @@ def initialize_star_cluster(
 
     distr_func: Callable
         function for object spatial distribution
-        ex) new_plummer_model
-        signature of function should be
-        func(number_of_particles, *distr_args,
-             convert_nbody=converter, **distr_kwargs)
+        ex) ``new_plummer_model``
+        signature of function should be::
+
+            func(number_of_particles, *distr_args,
+                 convert_nbody=converter, **distr_kwargs)
+
     distr_args: list, optional
         the arguments for `distr_func`
     distr_kwargs: dict, optional
@@ -176,10 +179,12 @@ def initialize_star_cluster(
 
     gravity_func: Callable or False, optional
         gravity code
-        signature of function should be
-        func(converter, *`gravity_args`,
-             number_of_workers=`number_of_workers`,
-             **`gravity_kwargs`)
+        function signature should be::
+
+            func(converter, *gravity_args,
+                 number_of_workers=number_of_workers,
+                 **gravity_kwargs)
+
     gravity_args: list, optional
         the arguments for `gravity_func`
     gravity_kwargs: dict, optional
@@ -326,14 +331,17 @@ def _initialize_star_cluster_bound(
     ----------
     number_of_particles: int or Particles
         if int, number of particles in the system
-        if Particles instance, then the `imf_`, `distr_,
+        if Particles instance, then the `imf_`, `distr_`,
         and kwargs before `evln_func` are ignored
 
     imf_func: Callable
         function for initial mass function
-        ex) new_kroupa_mass_distribution
-        signature of function should be
-        func(number_of_particles, *imf_args, random=random, **imf_kwargs)
+        ex) ``new_kroupa_mass_distribution``
+        signature of function should be::
+
+            func(number_of_particles, *imf_args,
+                 random=random, **imf_kwargs)
+
     imf_args: list, optional
         the arguments for `imf_func`
     imf_kwargs: dict, optional
@@ -341,10 +349,12 @@ def _initialize_star_cluster_bound(
 
     distr_func: Callable
         function for object spatial distribution
-        ex) new_plummer_model
-        signature of function should be
-        func(number_of_particles, *distr_args,
+        ex) ``new_plummer_model``
+        signature of function should be::
+
+            func(number_of_particles, *distr_args,
              convert_nbody=converter, **distr_kwargs)
+
     distr_args: list, optional
         the arguments for `distr_func`
     distr_kwargs: dict, optional
@@ -370,10 +380,12 @@ def _initialize_star_cluster_bound(
 
     gravity_func: Callable or False, optional
         gravity code
-        signature of function should be
-        func(converter, *`gravity_args`,
-             number_of_workers=`number_of_workers`,
-             **`gravity_kwargs`)
+        signature of function should be::
+
+            func(converter, *gravity_args,
+                 number_of_workers=number_of_workers,
+                 **gravity_kwargs)
+
     gravity_args: list, optional
         the arguments for `gravity_func`
     gravity_kwargs: dict, optional
@@ -405,10 +417,12 @@ def _initialize_star_cluster_bound(
     -------
     system: datamodel.System
         a dataclass object with parameters
+
             - particles
             - evolution
             - gravity
             - converter
+
         will try to automatically make channels to/from all things
         the amuse particles / evolution / gravity classes are proxied
         in a datamodel.Container that adds .name, .channel_to/from
@@ -478,15 +492,13 @@ def _initialize_star_cluster_unbound(
     function can be used separately from `_initialize_star_cluster_bound`,
     which often needs to be overwritten, while this function does not.
 
-
-
     Parameters
     ----------
     bound_cluster : System
     bound_inputs : BoundArguments
     bound_system_func: Callable
         function to construct bound cluster
-        defaults to ``_initialize_star_cluster_bound``
+        defaults to `_initialize_star_cluster_bound`
     bound_radius : Any, optional
         the bound radius beyond which anything is considered unbound
     init_arg : Tuple[str, Any], optional
@@ -497,11 +509,6 @@ def _initialize_star_cluster_unbound(
     -------
     unbound_cluster : System
     unbound_inputs : BoundArguments
-
-    See Also
-    --------
-    ``initialize_star_cluster``
-    ``_initialize_star_cluster_bound``
 
     """
 
@@ -543,7 +550,9 @@ def _initialize_star_cluster_unbound(
 def separate_bound_unbound(
     bound_cluster, unbound_cluster, bound_radius, cdf_code=None, converter=None
 ):
-    """Separate Unbound particles from Bound Particles by a simple radius cut from the center of mass.
+    """Separate Unbound particles from Bound Particles.
+
+    Uses a simple radius cut from the center of mass.
 
     Also reset cdf_code parameters, if provided.
 

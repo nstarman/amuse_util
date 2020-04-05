@@ -2,11 +2,7 @@
 Amuse Utils
 ###########
 
-Welcome to ``amuse_util``, a collection of useful python codes. This is a
-centralized repository for non project-specific code. There are modules for making advanced decorators, interfacing with IPython environments, miscellaneous
-astronomical functions, data utilities, making fitting libraries
-inter-operable, improving astropy units and quantity-enabled functions,
-and much more.
+``amuse_util`` is a package for working with the AMUSE code, with Astropy formats, to more easily create and run N-Body simulations.
 
 The package is being actively developed in a `public repository on GitHub <https://github.com/nstarman/amuse_util>`_ so if you have any trouble, `open an issue <https://github.com/nstarman/amuse_util/issues>`_ there.
 
@@ -27,7 +23,7 @@ Documentation
    amuse_util/index
    documentation/benefits
    documentation/testing
-   whatsnew/1.0
+   whatsnew/0.1
 
 
 ***********
@@ -37,28 +33,12 @@ Subpackages
 .. toctree::
    :maxdepth: 1
 
-   amuse_util/config
-   amuse_util/astro/index
-   amuse_util/constants/index
-   amuse_util/data_utils/index
-   amuse_util/decorators/index
-   amuse_util/imports/index
-   amuse_util/ipython/index
-   amuse_util/math/index
-   amuse_util/plot/index
-   amuse_util/scripts/index
+   amuse_util/data/index
+   amuse_util/datamodel/index
+   amuse_util/ic/index
+   amuse_util/simulation/index
+   amuse_util/units/index
    amuse_util/utils/index
-
-
-*********
-Tutorials
-*********
-
-.. toctree::
-   :maxdepth: 1
-
-   examples/ipython-imports.ipynb
-   examples/making-decorators.ipynb
 
 
 *****************
@@ -81,16 +61,12 @@ If you make use of this code, please consider citing the Zenodo DOI as a softwar
 
 ::
 
-   @software{nstarman_2020_3740580,
+   @software{nstarman_zenodo,
      author       = {nstarman},
-     title        = {{nstarman/amuse\_util: For Zenodo DOI in v0.1 
-                      release}},
-     month        = apr,
-     year         = 2020,
+     title        = {amuse\_util},
      publisher    = {Zenodo},
-     version      = {v0.1-alpha},
-     doi          = {10.5281/zenodo.3740580},
-     url          = {https://doi.org/10.5281/zenodo.3740580}
+     doi          = {10.5281/zenodo.3740579},
+     url          = {https://doi.org/10.5281/zenodo.3740579}
    }
 
 .. |DOI| image:: https://zenodo.org/badge/239362836.svg

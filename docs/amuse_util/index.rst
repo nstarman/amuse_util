@@ -1,8 +1,8 @@
-************************
-AmuseUtils Documentation
-************************
+**********************
+`amuse_util` on import
+**********************
 
-This is the documentation for AmuseUtils.
+This is the documentation for the top-level of ``amuse_util``, ie, what happens on import.
 
 
 Reference/API
@@ -20,3 +20,7 @@ Subpackages
 
    data/index
    datamodel/index
+   ic/index
+   simulation/index
+   units/index
+   utils/index

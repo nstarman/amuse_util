@@ -36,16 +36,12 @@ If you make use of this code, please consider citing as a software citation.
 
 ::
 
-   @software{nstarman_2020_3740580,
+   @software{nstarman_zenodo,
      author       = {nstarman},
-     title        = {{nstarman/amuse\_util: For Zenodo DOI in v0.1 
-                      release}},
-     month        = apr,
-     year         = 2020,
+     title        = {amuse\_util},
      publisher    = {Zenodo},
-     version      = {v0.1-alpha},
-     doi          = {10.5281/zenodo.3740580},
-     url          = {https://doi.org/10.5281/zenodo.3740580}
+     doi          = {10.5281/zenodo.3740579},
+     url          = {https://doi.org/10.5281/zenodo.3740579}
    }
 
 
