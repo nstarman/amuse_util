@@ -23,13 +23,23 @@ import numpy as np
 
 from amuse.units import units as u
 
+# extra
 try:
-    import astroPHD
+    import utilipy
 except ImportError:
-    import functools
+    from functools import wraps as _wraps, partial
+
     _GOOD_DECORATORS = False
+
+    def wraps(*args, **kwargs):
+        """Wraps with utilipy-style signature."""
+        return _wraps(*args)
+
+    # /def
+
 else:
-    from astroPHD.util.functools import functools
+    from utilipy.utils.functools import wraps, partial
+
     _GOOD_DECORATORS = True
 
 
@@ -158,7 +168,7 @@ def num_particles_from_mtot_given_mass_func(
 
 
 def imf_number_of_particles_decorator(
-    function: Optional[FunctionType]=None, *, tolerance: float = 1e-5
+    function: Optional[FunctionType] = None, *, tolerance: float = 1e-5
 ) -> FunctionType:
     """For IMF functions, allows mass argument for `number_of_particles`.
 
@@ -185,13 +195,11 @@ def imf_number_of_particles_decorator(
 
     """
     if function is None:  # allowing for optional arguments
-        return functools.partial(
-            imf_number_of_particles_decorator, tolerance=tolerance
-        )
+        return partial(imf_number_of_particles_decorator, tolerance=tolerance)
 
     # make decorator, specifying docstring style
-    # @functools.wraps(function, _doc_style="numpy")
-    @functools.wraps(function)
+    # @wraps(function, _doc_style="numpy")
+    @wraps(function)
     def wrapper(
         number_of_particles: Union[int, Any],  # TODO correct Any
         *func_args: Any,

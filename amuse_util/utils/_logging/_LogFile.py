@@ -5,7 +5,7 @@
 #
 # TITLE   : LogFile
 # AUTHOR  : Nathaniel Starkman
-# PROJECT : astroPHD
+# PROJECT : utilipy
 #
 # ----------------------------------------------------------------------------
 
@@ -26,6 +26,7 @@ from typing import Any, Union, Optional
 
 # PROJECT-SPECIFIC
 from ._LogPrint import LogPrint
+
 # from ..metaclasses import InheritDocstrings
 
 

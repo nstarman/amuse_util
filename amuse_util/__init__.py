@@ -31,6 +31,7 @@ The AMUSE papers [1]_, [2]_, [3]_, [4]_, [5]_.
 __author__ = "Nathaniel Starkman"
 __license__ = "BSD-3"
 
+
 __all__ = []
 
 
@@ -59,10 +60,11 @@ from .units import (
     to_astropy,
     to_amuse,
 )
+
 # from .utils import amuseify_array
 
-# Import top-level for __all__
-from . import datamodel
+# Import top-level modules for __all__
+from . import data, utils, datamodel, ic, simulation, units
 
 
 ##############################################################################

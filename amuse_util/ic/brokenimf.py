@@ -27,7 +27,7 @@ from amuse.units import units
 
 # PROJECT-SPECIFIC
 
-from .util import imf_number_of_particles_decorator
+from .utils import imf_number_of_particles_decorator
 
 
 ##############################################################################
@@ -40,7 +40,7 @@ def new_kroupa_mass_distribution(
     number_of_particles: int,
     mass_min: units.MSun = 0.01 | units.MSun,
     mass_max: units.MSun = 100.0 | units.MSun,
-    random: bool=True,
+    random: bool = True,
 ):
     """Kroupa (2001) mass distribution in SI units with custom minimum mass.
 

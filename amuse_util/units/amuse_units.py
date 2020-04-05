@@ -24,14 +24,14 @@ from amuse.units.units import *  # so this module is a drop-in for amuse units
 ###############################################################################
 # UNITS
 
-mas = _core.named_unit('milliarcsecond', 'mas', _amu.arcsec / 1000)
+mas = _core.named_unit("milliarcsecond", "mas", _amu.arcsec / 1000)
 
 
 ###############################################################################
 # __ALL__
 
 # __all__ += _amu.__all__
-__all__ += ['mas']
+__all__ += ["mas"]
 
 ##############################################################################
 # END

@@ -34,7 +34,7 @@ from amuse.units import units as u, nbody_system
 
 # PROJECT-SPECIFIC
 
-from ..util import amuseify_array
+from ..utils import amuseify_array
 
 
 ###############################################################################

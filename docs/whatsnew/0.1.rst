@@ -1,0 +1,12 @@
+.. _whatsnew-0.1:
+
+********************************
+What's New in `amuse_util` v0.1?
+********************************
+
+Bug fixes (in X releases) are annotated with `@X`
+
+Overview
+========
+
+Adopted the Astropy-affiliate template.

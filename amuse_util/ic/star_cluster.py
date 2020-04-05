@@ -16,6 +16,7 @@ _initialize_star_cluster_unbound
 __author__ = "Nathaniel Starkman"
 
 __all__ = [
+    "SC_Tuple",
     "initialize_star_cluster",
     "separate_bound_unbound",
     "_initialize_star_cluster_bound",
@@ -29,8 +30,8 @@ __all__ = [
 # GENERAL
 
 import copy
-from types import FunctionType
 from collections import namedtuple
+from typing import Tuple, Any, Callable
 
 import numpy as np
 
@@ -45,13 +46,13 @@ from amuse.units import nbody_system
 # CUSTOM
 
 try:
-    import astroPHD
+    import utilipy
 except ImportError:
     from ..utils import store_function_input
     from ..utils._logging import LogFile
 else:
-    from astroPHD import LogFile
-    from astroPHD.decorators import store_function_input
+    from utilipy import LogFile
+    from utilipy.decorators import store_function_input
 
 # PROJECT-SPECIFIC
 
@@ -90,11 +91,11 @@ def initialize_star_cluster(
     number_of_particles: (int, Particles),
     *,  # must use kwargs
     # for IMF
-    imf_func: (bool, FunctionType) = True,
+    imf_func: (bool, Callable) = True,
     imf_args: list = [],
     imf_kwargs: dict = {},
     # for distribution function
-    distr_func: (bool, FunctionType) = True,
+    distr_func: (bool, Callable) = True,
     distr_args: list = [],
     distr_kwargs: dict = {},
     # object properties
@@ -103,10 +104,10 @@ def initialize_star_cluster(
     velocity: amu.kms = [0, 0, 0] | amu.kms,
     obj_radius: amu.AU = 0 | amu.AU,  # size of each object
     # for evolution
-    evln_func: (bool, FunctionType) = False,
+    evln_func: (bool, Callable) = False,
     evln_kwargs: dict = {},
     # for gravity
-    gravity_func: (bool, FunctionType) = False,
+    gravity_func: (bool, Callable) = False,
     gravity_args: list = [],
     gravity_kwargs: dict = {},
     smoothing_length: amu.parsec = 0.0 | amu.parsec,
@@ -119,7 +120,6 @@ def initialize_star_cluster(
     random=True,
     make_unbound=True,
     _num_particles_reconstruct: (int, None) = None,
-    # channel_attrs=None,
     # logging
     logger: LogFile = _LOGFILE,
     verbose: (int, None) = None,
@@ -135,7 +135,7 @@ def initialize_star_cluster(
         if Particles instance, then the `imf_`, `distr_,
         and kwargs before `evln_func` are ignored
 
-    imf_func: FunctionType
+    imf_func: Callable
         function for initial mass function
         ex) new_kroupa_mass_distribution
         signature of function should be
@@ -145,7 +145,7 @@ def initialize_star_cluster(
     imf_kwargs: dict, optional
         the kwargs for `imf_func`
 
-    distr_func: FunctionType
+    distr_func: Callable
         function for object spatial distribution
         ex) new_plummer_model
         signature of function should be
@@ -168,13 +168,13 @@ def initialize_star_cluster(
         the radius of the individual objects,
         (default 0 AU)
 
-    evln_func: FunctionType or False, optional
+    evln_func: Callable or False, optional
         (default False)
         object evolution function
     imf_kwargs: dict, optional
         the kwargs for `evln_func`
 
-    gravity_func: FunctionType or False, optional
+    gravity_func: Callable or False, optional
         gravity code
         signature of function should be
         func(converter, *`gravity_args`,
@@ -250,7 +250,6 @@ def initialize_star_cluster(
         timestep=timestep,
         random=random,
         _num_particles_reconstruct=_num_particles_reconstruct,
-        # channel_attrs=None,
         # logging
         logger=logger,
         verbose=verbose,
@@ -287,11 +286,11 @@ def _initialize_star_cluster_bound(
     number_of_particles: (int, Particles),
     *,  # must use kwargs
     # for IMF
-    imf_func: (bool, FunctionType) = True,
+    imf_func: (bool, Callable) = True,
     imf_args: list = [],
     imf_kwargs: dict = {},
     # for distribution function
-    distr_func: (bool, FunctionType) = True,
+    distr_func: (bool, Callable) = True,
     distr_args: list = [],
     distr_kwargs: dict = {},
     # object properties
@@ -300,10 +299,10 @@ def _initialize_star_cluster_bound(
     velocity: amu.kms = [0, 0, 0] | amu.kms,
     obj_radius: amu.AU = 0 | amu.AU,  # size of each object
     # for evolution
-    evln_func: (bool, FunctionType) = False,
+    evln_func: (bool, Callable) = False,
     evln_kwargs: dict = {},
     # for gravity
-    gravity_func: (bool, FunctionType) = False,
+    gravity_func: (bool, Callable) = False,
     gravity_args: list = [],
     gravity_kwargs: dict = {},
     smoothing_length: amu.parsec = 0.0 | amu.parsec,
@@ -315,7 +314,6 @@ def _initialize_star_cluster_bound(
     timestep: amu.Myr = 1.0 | amu.Myr,
     random=True,
     _num_particles_reconstruct: (int, None) = None,
-    # channel_attrs=None,
     # logging
     logger: LogFile = _LOGFILE,
     verbose: (int, None) = None,
@@ -331,7 +329,7 @@ def _initialize_star_cluster_bound(
         if Particles instance, then the `imf_`, `distr_,
         and kwargs before `evln_func` are ignored
 
-    imf_func: FunctionType
+    imf_func: Callable
         function for initial mass function
         ex) new_kroupa_mass_distribution
         signature of function should be
@@ -341,7 +339,7 @@ def _initialize_star_cluster_bound(
     imf_kwargs: dict, optional
         the kwargs for `imf_func`
 
-    distr_func: FunctionType
+    distr_func: Callable
         function for object spatial distribution
         ex) new_plummer_model
         signature of function should be
@@ -364,13 +362,13 @@ def _initialize_star_cluster_bound(
         the radius of the individual objects,
         (default 0 AU)
 
-    evln_func: FunctionType or False, optional
+    evln_func: Callable or False, optional
         (default False)
         object evolution function
     imf_kwargs: dict, optional
         the kwargs for `evln_func`
 
-    gravity_func: FunctionType or False, optional
+    gravity_func: Callable or False, optional
         gravity code
         signature of function should be
         func(converter, *`gravity_args`,
@@ -411,7 +409,6 @@ def _initialize_star_cluster_bound(
             - evolution
             - gravity
             - converter
-            - channel_attrs
         will try to automatically make channels to/from all things
         the amuse particles / evolution / gravity classes are proxied
         in a datamodel.Container that adds .name, .channel_to/from
@@ -451,7 +448,6 @@ def _initialize_star_cluster_bound(
         timestep=timestep,
         random=random,
         _num_particles_reconstruct=_num_particles_reconstruct,
-        # channel_attrs=None,
         # logging
         logger=logger,
         verbose=verbose,
@@ -473,21 +469,29 @@ def _initialize_star_cluster_bound(
 def _initialize_star_cluster_unbound(
     bound_cluster,
     bound_inputs,
+    bound_system_func: Callable,
     bound_radius=None,  # TODO should None be allowable?
-    bound_system_func: FunctionType = _initialize_star_cluster_bound,
+    init_arg: Tuple[str, Any] = ("number_of_particles", 2),
 ) -> tuple:
     """Initialize unbound system from Contenta (2018) star cluster.
 
     function can be used separately from `_initialize_star_cluster_bound`,
     which often needs to be overwritten, while this function does not.
 
+
+
     Parameters
     ----------
     bound_cluster : System
     bound_inputs : BoundArguments
-    bound_system_func: FunctionType
+    bound_system_func: Callable
         function to construct bound cluster
         defaults to ``_initialize_star_cluster_bound``
+    bound_radius : Any, optional
+        the bound radius beyond which anything is considered unbound
+    init_arg : Tuple[str, Any], optional
+        the arguments needed to make the smallest version of the star cluster
+        default is ("number_of_particles", 2)
 
     Returns
     -------
@@ -500,26 +504,29 @@ def _initialize_star_cluster_unbound(
     ``_initialize_star_cluster_bound``
 
     """
-    if bound_radius is None:
-        bound_radius = bound_cluster.bound_radius_cutoff
 
     ba = copy.copy(bound_inputs)
 
-    ba.arguments[
-        "number_of_particles"
-    ] = 2  # need 2 to initialize, then remove
+    ba.arguments[init_arg[0]] = init_arg[1]  # need to initialize, then remove
 
     (unbound_cluster, unbound_inputs,) = bound_system_func(
         *ba.args, store_inputs=False, **ba.kwargs
     )
 
     # remove initialization particles
-    unbound_cluster.gravity.particles.remove_particles(
-        unbound_cluster.particles
-    )
     unbound_cluster.particles.remove_particles(unbound_cluster.particles)
+    if unbound_cluster.gravity is not None:
+        unbound_cluster.gravity.particles.synchronize_to(
+            unbound_cluster.particles
+        )
+    if unbound_cluster.evolution is not None:
+        unbound_cluster.evolution.particles.synchronize_to(
+            unbound_cluster.particles
+        )
 
     # find bound & unbound particles
+    if bound_radius is None:
+        bound_radius = bound_cluster.bound_radius_cutoff
     bound_cluster, unbound_cluster, _ = separate_bound_unbound(
         bound_cluster, unbound_cluster, bound_cluster.bound_radius_cutoff
     )

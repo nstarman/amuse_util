@@ -80,11 +80,11 @@ matrix:
           env: TOXENV=build_docs
 
         # Now try Astropy dev with the latest Python
-        # - os: linux
-        #   python: 3.8
-        #   name: Python 3.8 with developer version of astropy
-        #   stage: Comprehensive tests
-        #   env: TOXENV=py38-test-devdeps
+        - os: linux
+          python: 3.8
+          name: Python 3.8 with developer version of astropy
+          stage: Comprehensive tests
+          env: TOXENV=py38-test-devdeps
 
         # And with an older Python, Astropy LTS, and the oldest supported Numpy
         - os: linux
@@ -130,11 +130,36 @@ matrix:
     allow_failures:
         # Do a PEP8 test with flake8
         # (do allow to fail unless your code completely compliant)
-        # - os: linux
-        #   python: 3.8
-        #   name: Code style checks
-        #   stage: Initial tests
-        #   env: TOXENV=codestyle
+
+        - os: linux
+          python: 3.8
+          name: Black style check
+          stage: Initial tests
+          env: TOXENV=black
+
+        - os: linux
+          python: 3.8
+          name: mypy check
+          stage: Comprehensive tests
+          env: TOXENV=mypy
+
+        - os: linux
+          python: 3.8
+          name: unused code check
+          stage: Comprehensive tests
+          env: TOXENV=unused_code
+
+        - os: linux
+          python: 3.8
+          name: RST link check
+          stage: Comprehensive tests
+          env: TOXENV=linkcheck
+
+before_install:
+ # skip travis build if [skip travis] or [travis skip] in commit message
+ # built into travis, but a good reminder
+ - if git show -s HEAD | grep -F -q "[skip travis]" ; then echo "skip travis" && exit 0 ; fi
+ - if git show -s HEAD | grep -F -q "[travis skip]" ; then echo "skip travis" && exit 0 ; fi
 
 install:
 
@@ -154,8 +179,8 @@ script:
 
 after_success:
     # If coveralls.io is set up for this package, uncomment the two lines below.
-    pip install coveralls
-    coveralls
+    # pip install coveralls
+    # coveralls
     # If codecov is set up for this package, uncomment the two lines below
     # pip install codecov
     # codecov

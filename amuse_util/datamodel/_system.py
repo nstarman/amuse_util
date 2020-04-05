@@ -265,6 +265,11 @@ class Systems:
 
     # /def
 
+    @property
+    def time(self):
+        """Get the Bridge time"""
+        return self.gravity.model_time
+
     # ---------------------------------------------------------------
     # Representations
 

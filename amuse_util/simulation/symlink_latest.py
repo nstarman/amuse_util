@@ -62,10 +62,12 @@ def sorted_date_folders(contents):
 
     return np.sort(folders)
 
+
 # /def
 
 
 # --------------------------------------------------------------------------
+
 
 def make_symlink(drct):
     """Make a symlink called `latest` to folder with most recent date name.
@@ -79,22 +81,23 @@ def make_symlink(drct):
     old_dir = os.getcwd()
     os.chdir(drct)
 
-    contents = np.array(os.listdir('./'))
+    contents = np.array(os.listdir("./"))
     folders = sorted_date_folders(contents)
 
     if len(folders) > 0:  # not empty
         try:
-            os.rmdir('latest')
+            os.rmdir("latest")
         except OSError:
             pass
         try:
-            os.unlink('latest')
+            os.unlink("latest")
         except OSError:
             pass
 
-        os.symlink('./' + folders[-1], './latest')
+        os.symlink("./" + folders[-1], "./latest")
 
     os.chdir(old_dir)
+
 
 ###############################################################################
 # END

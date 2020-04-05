@@ -30,7 +30,7 @@ from .convert import (
     to_amuse_decorator,
     to_astropy,
     to_astropy_decorator,
-    convert_units_decorator
+    convert_units_decorator,
 )
 
 from . import amuse_units

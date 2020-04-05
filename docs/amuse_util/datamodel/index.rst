@@ -1,6 +1,6 @@
-************************
+***********************
 datamodel Documentation
-************************
+***********************
 
 This is the documentation for datamodel.
 

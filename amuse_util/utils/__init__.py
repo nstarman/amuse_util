@@ -29,12 +29,12 @@ from typing import Optional, Sequence
 
 # CUSTOM
 try:
-    import astroPHD
+    import utilipy
 except ImportError:
     _GOOD_DECORATORS = False
 else:
     _GOOD_DECORATORS = True
-    from astroPHD.decorators import store_function_input
+    from utilipy.decorators import store_function_input
 
 
 ##############################################################################
@@ -60,8 +60,8 @@ def amuseify_array(
 
     Examples
     --------
-    >>> amuseify_array([1 | u.Myr, 0.002 | u.Gyr], to_unit=u.Myr)
-    [1, 2] | u.Myr
+    >>> amuseify_array([1 | amu.Myr, 0.002 | amu.Gyr], to_unit=amu.Myr)
+    quantity<[1.0, 2.0] Myr>
 
     """
     if to_unit is None:
@@ -163,10 +163,10 @@ if _GOOD_DECORATORS is False:
         ----------------
         _doc_style: str or formatter, optional
             default 'numpy'
-            parameter to `astroPHD.wraps`
+            parameter to `utilipy.wraps`
         _doc_fmt: dict, optional
             default None
-            parameter to `astroPHD.wraps`
+            parameter to `utilipy.wraps`
 
         """
         if function is None:  # allowing for optional arguments
@@ -212,7 +212,6 @@ if _GOOD_DECORATORS is False:
         # /def
 
         return wrapper
-
 
     # /def
 

@@ -37,7 +37,7 @@ from amuse.datamodel import Particles
 # CUSTOM
 
 try:
-    from astroPHD import LogFile
+    from utilipy import LogFile
 except ImportError:
     from ..utils._logging import LogFile
 
@@ -168,22 +168,25 @@ def initialize_particles(
     # -------------------------------------------
 
     logger.report(
-        "\nInitialize Particles Arguments:\n",
-        f"number_of_particles: {number_of_particles}",
-        # for IMF
-        f"imf_func: {imf_func}",
-        f"imf_args: {imf_args}",
-        f"imf_kwargs: {imf_kwargs}",
-        # for distribution function
-        f"distr_func: {distr_func}",
-        f"distr_args: {distr_args}",
-        f"distr_kwargs: {distr_kwargs}",
-        # object properties
-        f"Rvirial: {Rvirial}",
-        f"position: {position}",
-        f"velocity: {velocity}",
-        f"obj_radius: {obj_radius}",
-        sep="\n    ",
+        "\n    ".join(
+            (
+                "\nInitialize Particles Arguments:\n",
+                f"number_of_particles: {number_of_particles}",
+                # for IMF
+                f"imf_func: {imf_func}",
+                f"imf_args: {imf_args}",
+                f"imf_kwargs: {imf_kwargs}",
+                # for distribution function
+                f"distr_func: {distr_func}",
+                f"distr_args: {distr_args}",
+                f"distr_kwargs: {distr_kwargs}",
+                # object properties
+                f"Rvirial: {Rvirial}",
+                f"position: {position}",
+                f"velocity: {velocity}",
+                f"obj_radius: {obj_radius}",
+            )
+        ),
         verbose=verbose,
     )
 
@@ -209,6 +212,7 @@ def initialize_particles(
     # ------------------------------------
     # converter
     # scaled to the system's total mass and virial radius
+
     if converter is None:
         converter = nbody_system.nbody_to_si(masses.sum(), Rvirial)
 
@@ -239,7 +243,7 @@ def initialize_particles(
 
     logger.report(
         "made objects",
-        f"system has virial radius: {objs.virial_radius().in_(u.parsec)}",
+        f"made objects, system has virial radius: {objs.virial_radius().in_(u.parsec)}",
         verbose=verbose,
     )
 
@@ -428,44 +432,45 @@ def initialize_system(
 
     # -------------------------------------------
 
-    logger.newsection(
-        "Initialize System", print=verbose > 0 if verbose is not None else True
-    )
     logger.report(
-        "\nInitialize System Arguments:\n",
-        f"number_of_particles: {number_of_particles}",
-        # for IMF
-        f"imf_func: {imf_func}",
-        f"imf_args: {imf_args}",
-        f"imf_kwargs: {imf_kwargs}",
-        # for distribution function
-        f"distr_func: {distr_func}",
-        f"distr_args: {distr_args}",
-        f"distr_kwargs: {distr_kwargs}",
-        # object properties
-        f"Rvirial: {Rvirial}",
-        f"position: {position}",
-        f"velocity: {velocity}",
-        f"obj_radius: {obj_radius}",
-        # for evolution
-        f"evln_func: {evln_func}",
-        f"evln_kwargs: {evln_kwargs}",
-        # for gravity
-        f"gravity_func: {gravity_func}",
-        f"gravity_args: {gravity_args}",
-        f"gravity_kwargs: {gravity_kwargs}",
-        f"smoothing_length: {smoothing_length}",
-        f"opening_angle: {opening_angle}",
-        f"number_of_workers: {number_of_workers}",
-        f"use_self_gravity: {use_self_gravity}",
-        # util
-        f"converter: {converter}",
-        f"timestep: {timestep}",
-        f"random: {random}",
-        f"channel_attrs: {'deprecated'}",
-        # debugging
-        f"_scale_to_standard: {_scale_to_standard}",
-        sep="\n    ",
+        "Initialize System:\n"
+        + "\n    ".join(
+            (
+                "Initialize System Arguments:\n",
+                f"number_of_particles: {number_of_particles}",
+                # for IMF
+                f"imf_func: {imf_func}",
+                f"imf_args: {imf_args}",
+                f"imf_kwargs: {imf_kwargs}",
+                # for distribution function
+                f"distr_func: {distr_func}",
+                f"distr_args: {distr_args}",
+                f"distr_kwargs: {distr_kwargs}",
+                # object properties
+                f"Rvirial: {Rvirial}",
+                f"position: {position}",
+                f"velocity: {velocity}",
+                f"obj_radius: {obj_radius}",
+                # for evolution
+                f"evln_func: {evln_func}",
+                f"evln_kwargs: {evln_kwargs}",
+                # for gravity
+                f"gravity_func: {gravity_func}",
+                f"gravity_args: {gravity_args}",
+                f"gravity_kwargs: {gravity_kwargs}",
+                f"smoothing_length: {smoothing_length}",
+                f"opening_angle: {opening_angle}",
+                f"number_of_workers: {number_of_workers}",
+                f"use_self_gravity: {use_self_gravity}",
+                # util
+                f"converter: {converter}",
+                f"timestep: {timestep}",
+                f"random: {random}",
+                f"channel_attrs: {'deprecated'}",
+                # debugging
+                f"_scale_to_standard: {_scale_to_standard}",
+            )
+        ),
         verbose=verbose,
     )
 
@@ -593,7 +598,7 @@ def initialize_system(
 
         gravity = None
 
-        logger.report("no no gravity", verbose=verbose)
+        logger.report("no gravity", verbose=verbose)
 
     # -------------------------------------------------------------------------
     # make a system & store inputs for reproduction
@@ -601,6 +606,8 @@ def initialize_system(
     system = System(
         particles=objs, evolution=evln, gravity=gravity, converter=converter,
     )
+
+    logger.report("System Initialized", verbose=verbose)
 
     return system
 

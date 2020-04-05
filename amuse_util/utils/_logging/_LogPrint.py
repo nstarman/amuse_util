@@ -4,7 +4,7 @@
 #
 # TITLE   : logfile_print
 # AUTHOR  : Nathaniel Starkman
-# PROJECT : astroPHD
+# PROJECT : utilipy
 #
 # ----------------------------------------------------------------------------
 
