@@ -161,7 +161,6 @@ before_install:
  # built into travis, but a good reminder
  - if git show -s HEAD | grep -F -q "[skip travis]" ; then echo "skip travis" && exit 0 ; fi
  - if git show -s HEAD | grep -F -q "[travis skip]" ; then echo "skip travis" && exit 0 ; fi
- - pip wheel --no-binary :all: amuse-framework
 
 install:
 
@@ -174,6 +173,7 @@ install:
         git clone --depth 1 git://github.com/astropy/ci-helpers.git;
         source ci-helpers/travis/setup_conda.sh;
       fi
+    - pip install amuse-framework
 
 script:
     - pip install tox
